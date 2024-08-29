@@ -9,14 +9,32 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: 'feedId',
 				as: 'favoriteUsers',
 			});
+			// Add association with the User model
+			this.belongsTo(models.users, {
+				foreignKey: 'createdBy',
+				as: 'creator',
+			});
 		}
 	}
 
 	FeedModel.init(
 		{
-			name: DataTypes.STRING,
-			favorite: DataTypes.BOOLEAN,
-			public: DataTypes.BOOLEAN,
+			name: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			topics: {
+				type: DataTypes.JSON,
+				allowNull: false,
+			},
+			public: {
+				type: DataTypes.BOOLEAN,
+				allowNull: false,
+			},
+			createdBy: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
 		},
 		{
 			sequelize,

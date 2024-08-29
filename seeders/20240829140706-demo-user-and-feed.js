@@ -6,7 +6,7 @@ module.exports = {
 		const saltRounds = 10;
 		const passwordHash = await bcrypt.hash("z+bS7z8P@@BfMu!LA#'f", saltRounds);
 
-		await queryInterface.bulkInsert(
+		const userId = await queryInterface.bulkInsert(
 			'users',
 			[
 				{
@@ -24,6 +24,7 @@ module.exports = {
 				name: 'Kiosko Feed',
 				public: true,
 				topics: JSON.stringify(['Colima', 'E-commerce', 'Retail', 'Services', 'Stock']),
+				createdBy: userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},

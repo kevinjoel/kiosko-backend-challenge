@@ -11,12 +11,25 @@ module.exports = {
 			},
 			name: {
 				type: Sequelize.STRING,
+				allowNull: false,
 			},
 			public: {
 				type: Sequelize.BOOLEAN,
+				allowNull: false,
 			},
 			topics: {
 				type: Sequelize.JSON,
+				allowNull: false,
+			},
+			createdBy: {
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				references: {
+					model: 'users',
+					key: 'id',
+				},
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL',
 			},
 			createdAt: {
 				allowNull: false,

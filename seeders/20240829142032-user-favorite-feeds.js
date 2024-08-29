@@ -12,7 +12,6 @@ module.exports = {
 			`SELECT id FROM Feeds WHERE name = 'Kiosko Feed';`,
 		);
 
-		// Insert data into the user_favorite_feeds table
 		await queryInterface.bulkInsert(
 			'user_favorite_feeds',
 			[
