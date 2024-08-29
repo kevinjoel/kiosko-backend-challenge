@@ -5,8 +5,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const { v4: uuidv4 } = require('uuid');
-const { NotFoundParser } = require('./middlewares/not-found.middleware.js');
-const { ErrorParser } = require('./middlewares/error.middleware.js');
+const { NotFoundParser } = require('./middlewares/not-found.middleware');
+const { ErrorParser } = require('./middlewares/error.middleware');
+const routes = require('./routes/index');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -21,7 +22,7 @@ app.all('*', (req, _res, next) => {
 	req.meta = {
 		ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
 		requestId: uuidv4(),
-		user_agent: req.headers['user-agent'],
+		userAgent: req.headers['user-agent'],
 		origin: req.headers.origin,
 	};
 
@@ -29,6 +30,8 @@ app.all('*', (req, _res, next) => {
 });
 
 app.use(bodyParser.json({ limit: '10mb' }));
+
+app.use('/api', routes);
 
 app.use(ErrorParser);
 app.use(NotFoundParser);
