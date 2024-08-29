@@ -35,7 +35,7 @@ class APIError extends BaseError {
 	constructor(
 		message,
 		httpCode = HttpStatusCode.InternalServerError,
-		isOperational = true,
+		isOperational = false,
 		description = 'Internal Server Error',
 	) {
 		super(message, httpCode, description, isOperational);

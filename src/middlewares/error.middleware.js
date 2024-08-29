@@ -26,7 +26,7 @@ class ErrorMessageHandler {
 const errorMessageHandler = new ErrorMessageHandler();
 
 const ErrorParser = async (err, req, res, next) => {
-	if (!errorHandler.isTrustedError(err)) {
+	if (!errorMessageHandler.isTrustedError(err)) {
 		next(err);
 	}
 
