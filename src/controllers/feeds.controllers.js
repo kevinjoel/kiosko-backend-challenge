@@ -1,5 +1,6 @@
 const { users, feeds, user_favorite_feeds } = require('../../models');
 const { APIError, HttpStatusCode } = require('../helpers/api-error.helper');
+const { findNewsPaper } = require('../helpers/newspaper.helper');
 const { generatePagination } = require('../helpers/paginator.helper');
 const { Op } = require('sequelize');
 
@@ -135,7 +136,120 @@ const findFeeds = async (req, res, next) => {
 	}
 };
 
+const findFeedDetails = async (req, res, next) => {
+	try {
+		const public = Boolean(req.public);
+		const userId = !public ? req.user.id : null;
+		const feedId = req.params?.id;
+		const { page = 1, startYear, endYear, searchTerm } = req.query;
+
+		const feed = await feeds.findOne({
+			where: { id: feedId },
+			attributes: { exclude: ['createdBy'] },
+			include: [
+				{
+					model: user_favorite_feeds,
+					as: 'favoriteUsers',
+					attributes: ['id', 'userId'],
+				},
+			],
+		});
+
+		if (!feed) {
+			throw new APIError(
+				`No feed found with this id: ${feedId}`,
+				HttpStatusCode.BadRequest,
+				false,
+			);
+		}
+
+		const resources = await findNewsPaper({
+			page,
+			year1: startYear,
+			year2: endYear,
+			terms: searchTerm,
+		});
+
+		const sanitizeFeed = {
+			id: feed.id,
+			name: feed.name,
+			favorite: !public && row?.favoriteUsers?.some((e) => e.userId == userId),
+			public: feed.public,
+			...resources,
+			createdAt: feed.createdAt,
+			updatedAt: feed.updatedAt,
+		};
+
+		res.status(HttpStatusCode.Ok).json(sanitizeFeed);
+	} catch (error) {
+		next(error);
+	}
+};
+
+const updateFeed = async (req, res, next) => {
+	try {
+		const feedId = req.params.id;
+		const { name, topics, public, createdBy } = req.body;
+
+		const feed = await feeds.findByPk(feedId);
+		if (!feed) {
+			throw new APIError(`Feed not found with id: ${feedId}`, HttpStatusCode.NotFound, false);
+		}
+
+		const updatedFeed = await feed.update({
+			name,
+			topics: Array.isArray(topics) ? topics : JSON.parse(topics),
+			public,
+			createdBy,
+		});
+
+		const result = await feeds.findOne({
+			where: { id: feedId },
+			include: [
+				{
+					model: users,
+					as: 'creator',
+					attributes: ['username'],
+				},
+			],
+		});
+
+		const sanitizedFeed = {
+			id: result.id,
+			name: result.name,
+			topics: result.topics,
+			public: result.public,
+			createdBy: result.creator ? result.creator.username : null,
+			updatedAt: result.updatedAt,
+		};
+
+		res.status(HttpStatusCode.Ok).json(sanitizedFeed);
+	} catch (error) {
+		next(error);
+	}
+};
+
+const deleteFeed = async (req, res, next) => {
+	try {
+		const feedId = req.params.id;
+
+		const feed = await feeds.findByPk(feedId);
+		if (!feed) {
+			throw new APIError(`Feed not found with id: ${feedId}`, HttpStatusCode.NotFound, false);
+		}
+
+		await feed.destroy();
+
+		res.status(HttpStatusCode.Ok).json({ message: 'Feed successfully deleted.' });
+	} catch (error) {
+		next(error);
+	}
+};
+
 module.exports = {
 	createFeed,
 	findFeeds,
+	findFeedDetails,
+	updateFeed,
+	deleteFeed,
 };
