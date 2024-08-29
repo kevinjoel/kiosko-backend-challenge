@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const authenticationRoutes = require('./authentication.routes.mjs');
-const feedsRoutes = require('./feeds.routes.mjs');
+const authenticationRoutes = require('./authentication.routes');
+const feedsRoutes = require('./feeds.routes');
 
 const router = Router();
 
