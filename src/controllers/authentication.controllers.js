@@ -4,10 +4,10 @@ const { generateAccessTokens } = require('../helpers/jwt.helper');
 
 const login = async (req, res, next) => {
 	try {
-		const payload = req.body;
+		const { username, password } = req.body;
 
-		const user = await users.findOne({ where: { username: payload?.username } });
-		const isMatchPassword = await user?.validPassword?.(payload.password);
+		const user = await users.findOne({ where: { username: username } });
+		const isMatchPassword = await user?.validPassword?.(password);
 
 		if (!user || !isMatchPassword) {
 			throw new APIError('Invalid username or password', HttpStatusCode.NotFound, false);
@@ -23,9 +23,21 @@ const login = async (req, res, next) => {
 
 const register = async (req, res, next) => {
 	try {
-		const payload = req.body;
+		const { username, password } = req.body;
 
-		res.json({ payload });
+		const existingUser = await users.findOne({ where: { username: username } });
+
+		if (existingUser) {
+			throw new APIError(
+				`User already exists with this username: ${username} try a different one.`,
+				HttpStatusCode.BadRequest,
+				false,
+			);
+		}
+
+		await users.create({ username, password });
+
+		res.status(HttpStatusCode.Created).json({ message: 'User registered successfully.' });
 	} catch (error) {
 		next(error);
 	}
