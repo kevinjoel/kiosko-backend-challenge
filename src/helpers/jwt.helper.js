@@ -19,7 +19,7 @@ const validateAccessToken = async (token) => {
 	const secret = Buffer.from(JWT_SECRET, 'base64');
 
 	const validated = new Promise((resolve) => {
-		jwt.verify(token, secret, verificationOptions, function (error, decoded) {
+		jwt.verify(token, secret, {}, function (error, decoded) {
 			if (error) {
 				resolve(null);
 			} else {
