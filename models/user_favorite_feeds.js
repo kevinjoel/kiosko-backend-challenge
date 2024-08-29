@@ -1,25 +1,44 @@
 'use strict';
-import { Model } from 'sequelize';
-export default (sequelize, DataTypes) => {
-	class user_favorite_feeds extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+	class UserFavoriteFeedsModel extends Model {
 		static associate(models) {
-			// define association here
+			this.belongsTo(models.users, {
+				foreignKey: 'userId',
+				as: 'user',
+			});
+			this.belongsTo(models.feeds, {
+				foreignKey: 'feedId',
+				as: 'feed',
+			});
 		}
 	}
-	user_favorite_feeds.init(
+
+	UserFavoriteFeedsModel.init(
 		{
-			feedId: DataTypes.INTEGER,
-			userId: DataTypes.INTEGER,
+			feedId: {
+				type: DataTypes.INTEGER,
+				references: {
+					model: 'feeds',
+					key: 'id',
+				},
+				onDelete: 'CASCADE',
+			},
+			userId: {
+				type: DataTypes.INTEGER,
+				references: {
+					model: 'users',
+					key: 'id',
+				},
+				onDelete: 'CASCADE',
+			},
 		},
 		{
 			sequelize,
 			modelName: 'user_favorite_feeds',
 		},
 	);
-	return user_favorite_feeds;
+
+	return UserFavoriteFeedsModel;
 };
