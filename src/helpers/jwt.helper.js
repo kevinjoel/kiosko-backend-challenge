@@ -16,6 +16,10 @@ const generateAccessTokens = (
 };
 
 const validateAccessToken = async (token) => {
+	if (!token) {
+		return false;
+	}
+
 	const secret = Buffer.from(JWT_SECRET, 'base64');
 
 	const validated = new Promise((resolve) => {

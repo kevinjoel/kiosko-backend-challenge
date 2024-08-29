@@ -37,6 +37,32 @@ const authenticator = async (req, _res, next) => {
 	}
 };
 
+const isAuthenticated = async (req, _res, next) => {
+	try {
+		const token =
+			req?.query?.accessToken ||
+			req?.params?.accessToken ||
+			req?.headers?.['x-access-token'] ||
+			req?.headers?.['access-token'] ||
+			req?.headers?.authorization?.split?.(' ')?.[1] ||
+			null;
+
+		const decoded = await validateAccessToken(token);
+
+		req.public = true;
+
+		if (decoded) {
+			req.public = false;
+			req.user = decoded;
+		}
+
+		next();
+	} catch (error) {
+		next(error);
+	}
+};
+
 module.exports = {
 	authenticator,
+	isAuthenticated,
 };

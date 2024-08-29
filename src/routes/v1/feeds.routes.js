@@ -1,14 +1,12 @@
 const { Router } = require('express');
 const FeedsControllers = require('../../controllers/feeds.controllers');
 const { requestBodyValidator } = require('../../middlewares/validators.middleware');
-const { authenticator } = require('../../middlewares/authenticator.middleware');
+const { authenticator, isAuthenticated } = require('../../middlewares/authenticator.middleware');
 const { body } = require('express-validator');
 
 const router = Router();
 
-router.get('', function (req, res) {
-	res.send('GET Feeds');
-});
+router.get('', isAuthenticated, FeedsControllers.findFeeds);
 
 /**
  * @swagger
