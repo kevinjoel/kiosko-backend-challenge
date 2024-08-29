@@ -9,7 +9,10 @@
 		"docker:logs": "docker-compose logs -f",
 		"docker:stop": "docker-compose down",
 		"database:migrate": "npx sequelize-cli db:migrate",
-		"database:seed": "npx sequelize-cli db:seed:all"
+		"database:seed": "npx sequelize-cli db:seed:all",
+		"env:decrypt": "[ -f .env.pass ] && yarn senv decrypt .env.enc -o .env || echo 'skipping env decryption, missing .env.pass'",
+		"env:encrypt": "yarn senv encrypt .env -o .env.enc",
+		"postinstall": "yarn env:decrypt"
 	},
 	"keywords": [],
 	"author": "",
@@ -33,6 +36,7 @@
 		"extensionless": "^1.9.9",
 		"nodemon": "^3.1.4",
 		"prettier": "^3.3.3",
+		"senv": "^1.0.2",
 		"sequelize-cli": "^6.6.2"
 	}
 }
