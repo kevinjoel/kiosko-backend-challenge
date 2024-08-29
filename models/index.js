@@ -22,12 +22,21 @@ fs.readdirSync(__dirname)
 		db[model.name] = model;
 	});
 
+if (env == 'development') {
+	console.group('Model names:');
+}
+
 Object.keys(db).forEach((modelName) => {
-	console.log('modelName', modelName);
+	if (env == 'development') {
+		console.log('Model:', modelName);
+	}
+
 	if (db[modelName].associate) {
 		db[modelName].associate(db);
 	}
 });
+
+console.groupEnd();
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
