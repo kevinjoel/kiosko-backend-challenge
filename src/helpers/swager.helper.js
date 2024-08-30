@@ -1,3 +1,5 @@
+// const swaggerAutogen = require('swagger-autogen')();
+
 const swaggerDefinition = {
 	openapi: '3.0.0',
 	info: {
@@ -5,7 +7,11 @@ const swaggerDefinition = {
 		description: 'Documentation for Kiosko Challenge API',
 		version: '1.0.0',
 	},
-	servers: [{ url: '/' }],
+	host: 'localhost:3000',
+	basePath: '/',
+	schemes: ['http', 'https'],
+	consumes: ['application/json'],
+	produces: ['application/json'],
 	components: {
 		securitySchemes: {
 			bearerAuth: {
@@ -133,6 +139,14 @@ const swaggerDefinition = {
 		},
 	],
 };
+
+/**
+ * Uncomment to generate swagger output
+ */
+// const outputFile = './swagger-output.json';
+// const endpointFiles = ['./routes/index.js'];
+
+// swaggerAutogen(outputFile, endpointFiles, swaggerDefinition);
 
 module.exports = {
 	swaggerDefinition,
