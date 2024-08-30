@@ -5,6 +5,7 @@
 	"scripts": {
 		"start": "node --import=extensionless/register -r dotenv/config ./src/server.js",
 		"dev": "nodemon --import=extensionless/register -r dotenv/config ./src/server.js",
+		"test": "jest",
 		"docker:run": "docker-compose up --build -d",
 		"docker:logs": "docker-compose logs -f",
 		"docker:stop": "docker-compose down",
@@ -37,9 +38,11 @@
 		"eslint": "^9.9.1",
 		"eslint-config-prettier": "^9.1.0",
 		"extensionless": "^1.9.9",
+		"jest": "^29.7.0",
 		"nodemon": "^3.1.4",
 		"prettier": "^3.3.3",
 		"senv": "^1.0.2",
-		"sequelize-cli": "^6.6.2"
+		"sequelize-cli": "^6.6.2",
+		"supertest": "^7.0.0"
 	}
 }

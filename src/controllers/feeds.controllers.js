@@ -6,7 +6,7 @@ const { Op } = require('sequelize');
 
 const createFeed = async (req, res, next) => {
 	try {
-		const { name, favorite, public, topics } = req.body;
+		const { name, favorite, public: isPublic, topics } = req.body;
 		const userId = req.user.id;
 
 		if (favorite) {
@@ -25,7 +25,7 @@ const createFeed = async (req, res, next) => {
 
 		const feed = await feeds.create({
 			name,
-			public: Boolean(public),
+			public: Boolean(isPublic),
 			topics: topics,
 			createdBy: userId,
 		});
@@ -47,8 +47,8 @@ const createFeed = async (req, res, next) => {
 
 const findFeeds = async (req, res, next) => {
 	try {
-		const public = Boolean(req.public);
-		const userId = !public ? req.user.id : null;
+		const isPublic = Boolean(req.public);
+		const userId = !isPublic ? req.user.id : null;
 
 		const { topic, createdBy, createdAt, name, page = 1 } = req.query;
 
@@ -81,8 +81,8 @@ const findFeeds = async (req, res, next) => {
 			};
 		}
 
-		if (public) {
-			filters.public = public;
+		if (isPublic) {
+			filters.public = isPublic;
 		}
 
 		const includes = [
@@ -93,7 +93,7 @@ const findFeeds = async (req, res, next) => {
 			},
 		];
 
-		if (public) {
+		if (isPublic) {
 			includes.push({
 				model: users,
 				as: 'creator',
@@ -113,13 +113,13 @@ const findFeeds = async (req, res, next) => {
 			const sanitizeRow = {
 				id: row.id,
 				name: row.name,
-				favorite: !public && row?.favoriteUsers?.some((e) => e.userId == userId),
+				favorite: !isPublic && row?.favoriteUsers?.some((e) => e.userId == userId),
 				public: row.public,
 				createdAt: row.createdAt,
 				updatedAt: row.updatedAt,
 			};
 
-			if (public) {
+			if (isPublic) {
 				sanitizeRow.createdBy = row?.creator?.username || '';
 			}
 
@@ -138,8 +138,8 @@ const findFeeds = async (req, res, next) => {
 
 const findFeedDetails = async (req, res, next) => {
 	try {
-		const public = Boolean(req.public);
-		const userId = !public ? req.user.id : null;
+		const isPublic = Boolean(req.public);
+		const userId = !isPublic ? req.user.id : null;
 		const feedId = req.params?.id;
 		const { page = 1, startYear, endYear, searchTerm } = req.query;
 
@@ -158,7 +158,7 @@ const findFeedDetails = async (req, res, next) => {
 		if (!feed) {
 			throw new APIError(
 				`No feed found with this id: ${feedId}`,
-				HttpStatusCode.BadRequest,
+				HttpStatusCode.NotFound,
 				false,
 			);
 		}
@@ -173,7 +173,7 @@ const findFeedDetails = async (req, res, next) => {
 		const sanitizeFeed = {
 			id: feed.id,
 			name: feed.name,
-			favorite: !public && row?.favoriteUsers?.some((e) => e.userId == userId),
+			favorite: !isPublic && row?.favoriteUsers?.some((e) => e.userId == userId),
 			public: feed.public,
 			...resources,
 			createdAt: feed.createdAt,
@@ -189,17 +189,18 @@ const findFeedDetails = async (req, res, next) => {
 const updateFeed = async (req, res, next) => {
 	try {
 		const feedId = req.params.id;
-		const { name, topics, public, createdBy } = req.body;
+		const { name, topics, public: isPublic, createdBy } = req.body;
 
 		const feed = await feeds.findByPk(feedId);
+
 		if (!feed) {
 			throw new APIError(`Feed not found with id: ${feedId}`, HttpStatusCode.NotFound, false);
 		}
 
-		const updatedFeed = await feed.update({
+		await feed.update({
 			name,
 			topics: Array.isArray(topics) ? topics : JSON.parse(topics),
-			public,
+			public: Boolean(isPublic),
 			createdBy,
 		});
 
@@ -240,7 +241,7 @@ const deleteFeed = async (req, res, next) => {
 
 		await feed.destroy();
 
-		res.status(HttpStatusCode.Ok).json({ message: 'Feed successfully deleted.' });
+		res.status(HttpStatusCode.NoContent).send();
 	} catch (error) {
 		next(error);
 	}

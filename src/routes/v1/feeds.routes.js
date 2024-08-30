@@ -364,7 +364,6 @@ router.put(
 		body('name').notEmpty().withMessage('Name is required'),
 		body('topics').isArray().withMessage('Topics must be an array'),
 		body('public').isBoolean().withMessage('Public status must be a boolean'),
-		body('createdBy').isInt().withMessage('CreatedBy must be an integer'),
 	],
 	requestBodyValidator,
 	FeedsControllers.updateFeed,

@@ -48,11 +48,15 @@ app.use(NotFoundParser);
 
 (async () => {
 	try {
-		app.listen(port, async () => {
-			console.log(`Server is running at http://localhost:${port}`);
-		});
+		if (require.main === module) {
+			app.listen(port, async () => {
+				console.log(`Server is running at http://localhost:${port}`);
+			});
+		}
 	} catch (error) {
 		console.error('Error initializing server:', error);
 		process.exit(1);
 	}
 })();
+
+module.exports = app;

@@ -2,8 +2,6 @@ const { BaseError, HttpStatusCode } = require('../helpers/api-error.helper');
 
 class ErrorMessageHandler {
 	handleError(err) {
-		console.error('ErrorHandler: ', err.message);
-
 		let message = err.message;
 
 		try {
